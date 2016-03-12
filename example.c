@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 void robot_cpy(const RRRobot* from, RRRobot* to)
 {
@@ -15,9 +16,9 @@ void move_print(
 {
   static const char* translations[7] =
   {
-    "movind forward 1 tile",
-    "movind forward 2 tiles",
-    "movind forward 3 tiles",
+    "moving forward 1 tile",
+    "moving forward 2 tiles",
+    "moving forward 3 tiles",
     "moving backward 1 tile",
     "rotating left",
     "rotating right",
@@ -60,37 +61,20 @@ int main (int argc, char **argv)
   RRRobot robot ;
   robot.line = board.tiles[0].line ;
   robot.column = board.tiles[0].column ;
-  robot.status = RR_ROBOT_E ;
+  robot.status = RR_ROBOT_N ;
 
   RRRobot prev_robot ;
   robot_cpy(&robot, &prev_robot) ;
-
-  robot_print(&robot) ;
     nod** Tab = malloc(sizeof(nod*)*1000);
   nod * D = initNod(&robot, RR_MOVE_FORWARD_1);
-  construitGraph(D, &board, Tab);
-  robot_print(D->data);
-  robot_print(arrive()->data);
-    RRRobotMove* moves = dijkstra(D, arrive());
-/*
-    const RRRobotMove moves[13] =
-            {
-                    RR_TURN_RIGHT,
-                    RR_MOVE_FORWARD_2,
-                    RR_MOVE_FORWARD_1,
-                    RR_U_TURN,
-                    RR_MOVE_FORWARD_1,
-                    RR_TURN_RIGHT,
-                    RR_MOVE_FORWARD_1,
-                    RR_MOVE_BACKWARD_1,
-                    RR_MOVE_FORWARD_2,
-                    RR_TURN_LEFT,
-                    RR_MOVE_FORWARD_3,
-                    RR_MOVE_BACKWARD_1,
-                    RR_MOVE_FORWARD_2
-            } ;*/
-    puts("###################");
-    printf("%d\n", moves[1]);
+
+  construitGraph2(D, &board, Tab);
+    //printTab();
+    //sleep(5);
+    robot_print(D->data);
+    robot_print(findNode(2, 2)->data);
+    RRRobotMove* moves = bydijkstra(D, findNode(2, 2), getTab(), getlength());
+
   for(unsigned int i = 1; i < moves[0]; ++i)
   {
     move_print(moves[i]) ;

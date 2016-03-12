@@ -150,6 +150,8 @@ typedef enum {
 typedef struct _nod{
     RRRobot* data;
     int dist;
+    int end;
+    int id;
     RRRobotMove move;
     struct _nod** neib;// nord sud est ouest
     struct _nod* prev;
@@ -180,9 +182,15 @@ typedef struct _path{
 }path;
 
 void construitGraph(nod* N, const RRBoard* board, nod** Tab);
+void construitGraph2(nod* N, const RRBoard* board, nod** Tab);
 RRRobot * duplicateBot(const RRRobot *);
 void newHorizon(int i, nod* N, RRRobotMove move, nod**, const RRBoard*);
 RRRobot* inTab(RRRobot* bot, nod** T, int);
 void addTab(nod* N, nod** T);
 nod * arrive();
+void printTab();
+nod* findNode(int line, int column);
+void completeGraphviz(nod* N1, nod* N2);
+nod** getTab();
+int getlength();
 #endif

@@ -1,12 +1,28 @@
 #include "board.h"
+#include <stdlib.h>
 #include <unistd.h>
 
+int id = 0;
 int nb_elem_tab = 0;
 int nb_elem_tab2 = 0;
+int nb_elem_tab3 = 0;
 nod* Tab2[1000];
+nod * Tab3[1024];
+FILE* fdp;
+nod* mort;
 
-static void robot_print(const RRRobot* robot)
-{
+
+nod** getTab(){
+    return Tab3;
+}
+
+int getlength(){
+    return nb_elem_tab3;
+}
+
+static void
+    robot_print(const RRRobot* robot){
+    /////////////////////////////////
     static const char* translations[5] =
             {
                     "east",
@@ -24,14 +40,43 @@ static void robot_print(const RRRobot* robot)
     ) ;
 }
 
+void printTab(){
+    int i;
+    for(i = 0 ; i < nb_elem_tab3 ; ++ i)
+        robot_print(Tab3[i]->data);
+}
+
 nod*
     arrive(){
     return Tab2[21];
 }
 
+void construitGraph2(nod* N, const RRBoard* board, nod** Tab){
+
+    Tab3[nb_elem_tab3] = N;
+    nb_elem_tab3 ++;
+
+    RRRobot * newbot = malloc(sizeof(RRRobot));
+    newbot->status = RR_ROBOT_DEAD;
+    newbot->column = 1000;
+    newbot->line = 1000;
+    mort = initNod(newbot, RR_MOVE_FORWARD_1);
+
+    fdp = fopen("graph.dot", "w");
+    fwrite("digraph b {\n" , 1 , 12, fdp );
+
+    N->id = id;
+    construitGraph(N, board, Tab);
+    printf ("il y a %d nodes dans le graph\n", id);
+
+    fwrite("}" , 1 , 1, fdp );
+
+}
+
 void
     construitGraph(nod* N, const RRBoard* board, nod** Tab){
-    ///////////////////////////////////////////////
+    ////////////////////////////////////////////////////////
+
 	//RRRobot * bot = N->data;
     int i;
     newHorizon(0, N, RR_MOVE_FORWARD_1, Tab, board);
@@ -55,16 +100,27 @@ void
     RRRobot * temp = duplicateBot(N->data);
     rr_board_play (board, temp, move);
 
-    if((replace = inTab(temp, Tab, nb_elem_tab)) != NULL)
-        N->neib[i] = initNod(replace, move);
+    if(temp->line < 0 || temp->column < 0)
+        N->neib[i] = mort;
     else {
-        N->neib[i] = initNod(temp, move);
-        addTab(N->neib[i], Tab);
+        if ((replace = inTab(temp, Tab, nb_elem_tab)) != NULL) {
+            N->neib[i] = initNod(replace, move);
+        }
+        else {
+            N->neib[i] = initNod(temp, move);
+            addTab(N->neib[i], Tab);
+            N->neib[i]->id = id++;
+        }
     }
-    if(inTab(N->data, Tab2, nb_elem_tab2) == NULL){
+    if(inTab(N->data, Tab2, nb_elem_tab2) == NULL) {
         Tab2[nb_elem_tab2] = N;
         nb_elem_tab2++;
     }
+        completeGraphviz(N, N->neib[i]);
+
+    Tab3[nb_elem_tab3] = N->neib[i];
+    nb_elem_tab3 ++ ;
+
 }
 
 RRRobot *
@@ -106,11 +162,105 @@ RRRobot*
 
 void
     addTab(nod* N, nod** T){
+    ////////////////////////
     T[nb_elem_tab] = N;
     nb_elem_tab ++ ;
 }
 
+nod*
+    findNode(int line, int column){
+    /////////////////
+    int i;
+    for(i = 0 ; i < nb_elem_tab3 ; ++i)
+        if(Tab3[i]->data->line == line && Tab3[i]->data->column == column)
+            return Tab3[i];
+    return NULL;
+}
+int sizeInt(int n){
+    int i = 0;
+    while(n != 0) {
+        n = n / 10;
+        ++i;
+    }
+    return i;
+}
 
+/* reverse:  reverse string s in place */
+void reverse(char s[])
+{
+    int i, j;
+    char c;
+
+    for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+        c = s[i];
+        s[i] = s[j];
+        s[j] = c;
+    }
+}
+
+/* itoa:  convert n to characters in s */
+void itoa(int n, char s[])
+{
+    int i, sign;
+
+    if ((sign = n) < 0)  /* record sign */
+        n = -n;          /* make n positive */
+    i = 0;
+    do {       /* generate digits in reverse order */
+        s[i++] = n % 10 + '0';   /* get next digit */
+    } while ((n /= 10) > 0);     /* delete it */
+    if (sign < 0)
+        s[i++] = '-';
+    s[i] = '\0';
+    reverse(s);
+}
+
+void completeGraphviz(nod* N1, nod* N2) {
+
+    //robot_print(N1->data);
+    int x1 = N1->data->line;
+    int y1 = N1->data->column;
+    int x2 = N2->data->line;
+    int y2 = N2->data->column;
+    int d1 = N1->data->status;
+    int d2 = N2->data->status;
+
+    char cx1[5];
+    char cy1[5];
+    char cx2[5];
+    char cy2[5];
+    char cd1[1];
+    char cd2[1];
+    char str[80] = "";
+
+    itoa(x1, cx1);
+    itoa(y1, cy1);
+    itoa(x2, cx2);
+    itoa(y2, cy2);
+    itoa(d1, cd1);
+    itoa(d2, cd2);
+    if (x1 < 0 || y1 < 0) {
+        strcat(str, "XXX");
+    }
+    else {
+        strcat(str, cx1);
+        strcat(str, cy1);
+        strcat(str, cd1);
+    }
+    strcat ( str, " -> " );
+    if (x2 < 0 || y2 < 0) {
+        strcat(str, "XXX");
+    }
+    else{
+        strcat(str, cx2);
+        strcat(str, cy2);
+        strcat(str, cd2);
+    }
+    strcat(str, "; ");
+    strcat(str, "\n");
+    //puts(str);
+    fwrite(str , 1 , sizeof(str) , fdp );
+}
 
 
 
