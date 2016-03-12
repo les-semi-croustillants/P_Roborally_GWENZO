@@ -27,6 +27,10 @@ nod* find(nod*);
 void updateNeibs(nod*);
 void updateDist(nod*, nod*);
 int end();
-
-
+nod* bestNode();
+void visited(nod*);
+nod* notvisited();
+void addNeib(nod*);
+void printPath();
+nod* findBestValue();
 #endif //ROBORALLY_DIJKSTRA_H
