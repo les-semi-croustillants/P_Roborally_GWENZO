@@ -1,48 +1,50 @@
+#ifndef ROBORALLY_GRAPH_H_
+#define ROBORALLY_GRAPH_H_
+
 #include "board.h"
+#include <limits.h>
+#include "array.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <malloc.h>
 
-typedef enum {
-		NORTH, 
-		SOUTH, 
-		EAST, 
-		WEST
-		}direction ;
+/* La structure de donnée utilisée pour representer tous les movements possibles du robot sur le plateau
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 
-typedef struct _nod{	
-	RRRobot* data;
-	int dist;
-	struct _nod** neib;// nord sud est ouest
-	struct _nod* prev;
+typedef struct _nod{
+    RRRobot* data;
+    unsigned int dist;
+    unsigned int goaldist;
+    int end;
+    unsigned int id;
+    int visited;
+    RRRobotMove move;
+    struct _nod** neib;// nord sud est ouest
+    struct _nod* prev;
+    dyntab* parent;
 }nod;
 
 nod* initNod(RRRobot *);
+void buildGraph(nod*, const RRBoard*, nod**);
+void initGraph(nod*, const RRBoard*, nod**);
+RRRobot * duplicateBot(const RRRobot *);
+void newHorizon(int, nod*, RRRobotMove, nod**, const RRBoard*);
+nod* inTab(RRRobot*, nod**, int);
+void addTab(nod*, nod**);
+nod* findNode(int, int, RRRobotStatus);
+void completeGraphviz(nod*, nod*);
+nod** getTab();
+int getId();
+void freeGraph();
+void freeNode(nod * N);
 
-
-#define TAILLE_BASE 15
-
-typedef struct _graph{
-	nod* depart;
-	int nb_nods;
-	int kappa;
-}graph;
-
-typedef struct _Cell{
-	direction dir;
-	nod* data;
-	struct _Cell* next;
-}cell;
-
-typedef struct _path{
-	int size;
-	cell* bestValue;
-	cell* first;
-	cell* last;
-}path;
-
-void construitGraph(nod* N, const RRBoard* board, nod** Tab);
-RRRobot * duplicateBot(RRRobot *);
-RRRobot * createNode(RRRobot *);
-void newHorizon(int i, nod* N, RRRobotMove move, nod**);
+#endif

@@ -5,7 +5,8 @@
 #ifndef ROBORALLY_DIJKSTRA_H
 #define ROBORALLY_DIJKSTRA_H
 
-#include "board.h"
+#include "heap.h"
+
 /*
 RRRobotMove* dijkstra(nod* D, nod * A);
 nod* closestOnPath();
@@ -22,7 +23,7 @@ void removeCell(path* , nod*);
 int isOnPathDir(path * P, nod * N, direction dir);
  */
 
-RRRobotMove* bydijkstra(nod*, nod*, nod**, int);
+RRRobotMove* byDijkstra(nod*, nod*, nod**, int);
 nod* find(nod*);
 void updateNeibs(nod*);
 void updateDist(nod*, nod*);
@@ -33,4 +34,7 @@ nod* notvisited();
 void addNeib(nod*);
 void printPath();
 nod* findBestValue();
+void updateParents(nod *);
+void reverseDijkstra(nod* goal, nod ** Tab, int nb);
+
 #endif //ROBORALLY_DIJKSTRA_H
