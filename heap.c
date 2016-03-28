@@ -1,188 +1,194 @@
-#include<stdio.h>
+/*#include<stdio.h>
 #include<limits.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
 #include<math.h>
-/*#include"graph.h"
-
-nod** heap;                                                         // this id the heap that will contain every "possibly next node"
-int heapSize;                                                       // this is the size of the heap
-///////////////////////////////////////////////////////////////////////////////////
-int                                                                 //
-    compare(nod * N1, nod* N2){                                     //
-    if(N1->dist < N2->dist)                                         //
-        return 1;                                                   //
-    return 0;                                                       //
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-
-void
-    swap(int n1, int n2){
-    nod * temp = heap[n1];
-    heap[n1] = heap[n2];
-    heap[n2] = temp;
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-
-void
-    push(nod* N){
-    heap[heapSize] = N;
-    heapSize ++ ;
-    int current = heapSize - 1;
-    if(heapSize != 0)
-        while(1){
-            if(compare(heap[current], heap[(current - 1) / 2]))
-                swap(current, (current - 1)/2);
-            if(current == 0 ||
-                    !compare(heap[current], heap[(current - 1) / 2]))
-                break;
-        }
-    N->visited = 1;
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-
-nod *
-    pop(){
-    swap(0, heapSize-1);
-    nod * max = heap[heapSize-1];
-    heapSize--;
-    int current = 0;
-    int child;
-    while(1){
-        child = current * 2 + 1;
-        if(child < heapSize && child + 1 >= heapSize){
-            if(compare(heap[child], heap[current]))
-                swap(current, child);
-            break;
-        }
-        if(child >= heapSize || child + 1 > heapSize)
-            break;
-        if(compare(heap[child], heap[current]))
-            swap(child, current);
-        else
-            break;
-        current = child;
-    }
-    max->end = 1;
-    return max;
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-
-void
-    initHeap(int sizeMax) {
-    heap = malloc(sizeof(nod*)*sizeMax);
-    heapSize = 0;
-}
+#include "array.h"
 */
-size_t bytes;
-void** heap;                                                         // this id the heap that will contain every "possibly next node"
-int heapSize;                                                       // this is the size of the heap
+
+#include "heap.h"
+/*
+typedef struct _nod{
+    int dist;
+    int value;
+    struct _nod * next;
+}nod;*/
+// this id the heap that will contain every "possibly next node" // this is the size of the heap
 ///////////////////////////////////////////////////////////////////////////////////
 int                                                                 //
-compare(void * N1, void* N2){                                     //
-    if(*(int*)N1 > *(int*)N2)                                         //
+comp(void * N1, void* N2){                                     //
+    if(*(int*)N1 < *(int*)N2)                                         //
         return 1;                                                   //
     return 0;                                                       //
 }
 
+int (*compare)(void*, void*);
+
+void display(dyntab* tab) {
+    int i = 0;
+    int i2;
+    int j = 0;
+    int nb_spaces = 0;
+    printf("{ ");
+    for (i; i < tab->size; ++i) {
+        printf("%d ", *(int *) (tab->data + i * tab->bytes));
+        if (i == j) {
+            j = 2 *i + 2;
+            puts("");
+        }
+    }
+/*
+    if(i != 0)
+        nb_spaces = 4*width/((2*(i) + 2) - (2*(i - 1) +2));
+    else
+        nb_spaces = width*2;
+    for(i2 = 0 ; i2 < nb_spaces ; ++i2){
+        printf(" ");
+    }*/
+    puts("}");
+}
+
 ///////////////////////////////////////////////////////////////////////////////////
 
-void
-swap(int n1, int n2){
-    void ** temp = malloc(bytes);
-    unsigned char * c_1 = (unsigned char*)(heap + n1 * bytes);
-    unsigned char * c_2 = (unsigned char*)(heap + n2 * bytes);
-    memcpy(temp, c_1, bytes);
-    memcpy(c_1, c_2, bytes);
-    memcpy(c_2, temp, bytes);
+static void
+swap(int n1, int n2, dyntab * tab){
+    void ** temp = malloc(tab->bytes);
+    unsigned char * c_1 = (unsigned char*)(tab->data + n1 * tab->bytes);
+    unsigned char * c_2 = (unsigned char*)(tab->data + n2 * tab->bytes);
+    memmove(temp, c_1, tab->bytes);
+    memmove(c_1, c_2, tab->bytes);
+    memmove(c_2, temp, tab->bytes);
     free(temp);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
 
 void
-push(void* n){
-    memcpy((char*)(heap + heapSize*bytes), n, bytes);
-    printf("%p, %d\n",(char*)(heap + heapSize*bytes), heapSize );
-    heapSize ++ ;
-    int current = heapSize - 1;
-    if(heapSize != 0)
-        while(1){
-            if(compare(heap + current*bytes, heap + (current - 1) / 2 * bytes))
-                swap(current, (current - 1)/2);
-            if(current == 0 ||
-               !compare(heap + current*bytes, heap + (current - 1) / 2 * bytes))
+push(void* n, dyntab* tab) {
+    dyntab_push(tab, n);
+    //heapSize++;
+    //int current = heapSize - 1;
+    int current = tab->size - 1;
+    if (tab->size != 0)
+        while (1) {
+            if (current == 0 ||
+                !compare(tab->data + current * tab->bytes, tab->data + (((current - 1) / 2) * tab->bytes)))
                 break;
+            if (compare(tab->data + current * tab->bytes, tab->data + (((current - 1) / 2) * tab->bytes)))
+                swap(current, (current - 1) / 2, tab);
+            current = (current - 1) / 2;
         }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
 
 void *
-pop(){
-    swap(0, heapSize-1);
-    void* max = heap + heapSize-1 * bytes;
-    heapSize--;
+    pop(dyntab* tab){
+    swap(0, tab->size -1, tab);
+
+    void* max = tab->data + (tab->size -1) * tab->bytes;
+    dyntab_pop(tab);
+    //heapSize--;
     int current = 0;
     int child;
     while(1){
         child = current * 2 + 1;
-        if(child < heapSize && child + 1 >= heapSize){
-            if(compare(heap + child*bytes, heap + current*bytes))
-                swap(current, child);
-            break;
+        if(child < tab->size){
+            if(child + 1 <  tab->size)
+                if(compare(tab->data + (child + 1)*tab->bytes, tab->data + child * tab->bytes ))
+                    child ++;
+            if(compare(tab->data + child * tab->bytes, tab->data + current * tab->bytes))
+                swap(child, current, tab);
         }
-        if(child >= heapSize || child + 1 > heapSize)
-            break;
-        if(compare(heap + child*bytes, heap + current * bytes))
-            swap(child, current);
         else
             break;
         current = child;
     }
+
     return max;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-void
-initHeap(int sizeMax, size_t type) {
-    bytes = type;
-    heap = malloc(bytes*sizeMax);
-    heapSize = 0;
+dyntab*
+initHeap(int function, size_t type) {
+    compare = function;
+    dyntab *tab = malloc(sizeof(dyntab));
+    dyntab_init(tab, type);
+    return tab;
 }
 
-void freeHeap(){
-    free(heap);
+void freeHeap(dyntab* tab){
+    dyntab_destroy(tab);
 }
 
-void display(){
+int correct(dyntab* tab){
     int i;
-    for(i = 0 ; i < heapSize ; ++i)
-        printf("%d ", *(int*)(heap + i * bytes));
-    puts("");
+    for(i = tab->size - 1 ; i > 0 ; -- i)
+        if (compare(tab->data + i*tab->bytes, tab->data  + ((i - 1) / 2)* tab->bytes))
+            return 0;
+    return 1;
 }
-int main(){
-    initHeap(1024, sizeof(int));
-    int a = 5;
-    int b = 10;
-    int c = 3;
-    int d = 7;
+/*
+int compnod(nod** n1, nod ** n2){
+    if((*n1)->dist < (*n2)->dist)
+        return 1;
+    return 0;
+}
 
-    push((void*)&a);
-    push((void*)&b);
-    push((void*)&c);
-    push((void*)&d);
-    display();
-    pop();
-    pop();
-    pop();
-    display();
+int main(){
+    dyntab* tab = initHeap(comp, sizeof(int*));
+    int value = 43;
+    dyntab_push(tab, &value);
+    for(int i = 0 ; i < 1000; ++i){
+        value = (rand()%1000) + 1;
+        push(&value, tab);
+    }
+    if (correct(tab))
+        puts("YEAHHHHHHH!!");
+    else
+        puts("NOOOOOOOOOO!");
+    display(tab);
+
 
     return 0;
 }
+
+/*
+int main(){
+    nod *** space = malloc(sizeof(nod**)*1024);
+    initHeap(compnod,space, 1024, sizeof(nod**));
+    printf("capacity : %d\n", capacity);
+
+    int i;
+    int k;
+
+
+    nod* A = malloc(sizeof(nod));
+    A->dist = 50;
+    A->value = 17;
+    printf("yoh %p\n",A);;
+
+    nod * B = malloc(sizeof(nod));
+    B->dist = 0;
+    B->value = 29;
+    B->next = NULL;
+    printf("yoh %p\n",B);
+
+    A->next = B;
+    correct();
+
+    push(&A);
+    push(&B);
+
+
+    nod * tmp = *(nod**)pop();
+    printf("%d\n",tmp->value);
+    printf("%p\n",tmp);
+    //printf("%d\n",((nod*)pop())->value);
+    return 0;
+}
+
+
+*/

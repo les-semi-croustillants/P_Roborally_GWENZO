@@ -1,4 +1,4 @@
-CC      = gcc
+CC      = gcc -w
 
 SOURCES = board.c
 HEADERS = $(SOURCES:.c=.h)
@@ -27,7 +27,7 @@ $(GTK_OBJECTS) : %.o : %.c
 
 ########## example ##########
 
-EXAMPLE_SOURCES = example.c graph.c dijkstra.c
+EXAMPLE_SOURCES = example.c graph.c dijkstra.c heap.c array.c wobowall_e.c
 EXAMPLE_OBJECTS = $(EXAMPLE_SOURCES:.c=.o)
 
 example : $(EXAMPLE_OBJECTS) $(OBJECTS) $(HEADERS)

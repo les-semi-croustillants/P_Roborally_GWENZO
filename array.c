@@ -105,3 +105,11 @@ void dyntab_print(const dyntab* tab, void (*elem_print)(const void* elem))
     }
     printf("]\n") ;
 }
+
+void* dyntab_return(const dyntab* tab, int cursor, int size){
+    return tab->data + cursor * size;
+}
+/*
+void dyntab_get(dyntab* tab, void* dest, int i){
+    memcpy(dest, tab->data + i * tab->bytes, tab->bytes) ;
+}*/

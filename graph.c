@@ -6,7 +6,8 @@ int nb_elem_tab = 0;
 int nb_elem_tab2 = 0;
 int nb_elem_tab3 = 0;
 nod* Tab2[50000];
-nod * Tab3[50000];
+nod* Tab3[50000];
+//nod* Tab3[100][100][5];
 FILE* fdp;
 nod* mort;
 
@@ -82,7 +83,7 @@ newHorizon(int i, nod* N, RRRobotMove move, nod** Tab, const RRBoard* board){
         nb_elem_tab2++;
     }
     completeGraphviz(N, N->neib[i]);
-    dyntab_push(N->neib[i]->parent, N);
+    dyntab_push(N->neib[i]->parent, &N);
 }
 
 RRRobot *
@@ -101,7 +102,7 @@ initNod(RRRobot * bot){
     nod** tab = malloc(sizeof(nod*)*7);
     N->neib = tab;
     N->parent = malloc(sizeof(dyntab));
-    dyntab_init(N->parent, sizeof(nod*));
+    dyntab_init(N->parent, sizeof(nod**));
     N->id = id;
     ++ id;
     int i;

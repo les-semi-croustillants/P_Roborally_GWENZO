@@ -36,5 +36,6 @@ void printPath();
 nod* findBestValue();
 void updateParents(nod *);
 void reverseDijkstra(nod* goal, nod ** Tab, int nb);
+int compareNodes(nod** N1, nod** N2);
 
 #endif //ROBORALLY_DIJKSTRA_H

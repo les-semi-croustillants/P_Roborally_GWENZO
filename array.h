@@ -50,4 +50,6 @@ void dyntab_pop_get(dyntab* tab, void* dest) ;
 /* Prints all the elements using the provided function */
 void dyntab_print(const dyntab* tab, void (*elem_print)(const void* elem)) ;
 
+void* dyntab_return(const dyntab* tab, int cursor, int size);
+
 #endif

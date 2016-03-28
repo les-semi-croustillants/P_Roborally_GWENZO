@@ -89,7 +89,8 @@ typedef enum {
   RR_MOVE_BACKWARD_1,
   RR_TURN_LEFT,
   RR_TURN_RIGHT,
-  RR_U_TURN
+  RR_U_TURN,
+    RR_NOT_MOVING
 } RRRobotMove ;
 
 /* Robot status (mostly orientation) */
@@ -106,10 +107,11 @@ typedef enum {
 /* Robot */
 
 typedef struct {
-  unsigned int line ;
-  unsigned int column ;
+    int line ;
+    int column ;
   RRRobotStatus status ;
 } RRRobot ;
+
 RRRobotStatus getStatus(RRRobot*);
 /** Board construction and destruction **/
 
@@ -140,58 +142,4 @@ void rr_board_play (
 
 //////////////////////////////////////////////////////////////////////////////
 
-typedef enum {
-    NORTH,
-    SOUTH,
-    EAST,
-    WEST
-}direction ;
-
-typedef struct _nod{
-    RRRobot* data;
-    unsigned int dist;
-    int end;
-    int id;
-    int visited;
-    RRRobotMove move;
-    struct _nod** neib;// nord sud est ouest
-    struct _nod* prev;
-}nod;
-
-nod* initNod(RRRobot *, RRRobotMove);
-
-
-#define TAILLE_BASE 15
-
-typedef struct _graph{
-    nod* depart;
-    int nb_nods;
-    int kappa;
-}graph;
-
-typedef struct _Cell{
-    direction dir;
-    nod* data;
-    struct _Cell* next;
-}cell;
-
-typedef struct _path{
-    int size;
-    cell* bestValue;
-    cell* first;
-    cell* last;
-}path;
-
-void construitGraph(nod* N, const RRBoard* board, nod** Tab);
-void construitGraph2(nod* N, const RRBoard* board, nod** Tab);
-RRRobot * duplicateBot(const RRRobot *);
-void newHorizon(int i, nod* N, RRRobotMove move, nod**, const RRBoard*);
-nod* inTab(RRRobot* bot, nod** T, int);
-void addTab(nod* N, nod** T);
-nod * arrive();
-void printTab();
-nod* findNode(int line, int column);
-void completeGraphviz(nod* N1, nod* N2);
-nod** getTab();
-int getlength();
 #endif

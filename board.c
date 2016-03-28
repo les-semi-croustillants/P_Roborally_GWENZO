@@ -615,6 +615,8 @@ void rr_board_play (
       robot_rotate(robot, ROTATION_RIGHT) ;
       robot_rotate(robot, ROTATION_RIGHT) ;
       break ;
+    default:
+      break;
   }
   board_apply(board, robot) ;
 }

@@ -1,4 +1,4 @@
-#include "dijkstra.h"
+#include "wobowall_e.h"
 
 void robot_cpy(const RRRobot* from, RRRobot* to)
 {
@@ -64,8 +64,8 @@ int main (int argc, char **argv)
   nod * D = initNod(&robot);
   initGraph(D, &board, Tab);
   robot_print(D->data);
-  nod * goal = findNode(4, 7, RR_ROBOT_E);
-  /*RRRobotMove* moves = byDijkstra(D, goal, getTab(), getId());
+  nod * goal = findNode(4, 4, RR_ROBOT_S);
+ /* RRRobotMove* moves = byDijkstra(D, goal, getTab(), getId());
 
   for(unsigned int i = 2; i < moves[0]; ++i) {
     printf("%d \n", i);
@@ -75,6 +75,9 @@ int main (int argc, char **argv)
   }
 */
   reverseDijkstra(goal, getTab(), getId());
+    puts("bonjour");
+    robot_print(D->data);
+  dontStopTillGetEnough(D, goal, &board);
   freeGraph();
   free(Tab);
   //free(moves);

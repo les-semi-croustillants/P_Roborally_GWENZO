@@ -9,10 +9,10 @@
 #include<math.h>
 #include"graph.h"
 
-void initHeap(int );
-void push(nod*);
-nod* pop();
-void freeHeap();
+dyntab* initHeap(int, size_t);
+void push(void*, dyntab*);
+void * pop(dyntab*);
+void freeHeap(dyntab*);
 
 #endif
 
